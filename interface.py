@@ -9,7 +9,7 @@ session=Session()
 def add_vaccine():
     vaccine_name=input("Vaccine name:")
     vaccine=Vaccine(vaccine_name)
-    session.add(vaccine_name)
+    session.add(vaccine)
     session.commit()
     pass
 
@@ -29,9 +29,23 @@ def add_pet(owner_id):
     pet_type=input("Pet type:")
     pet_age=input("Pet age:")
     pet_owner_id=owner_id
-    pet_vaccine_id=""
+    pet_vaccine_id=choose_vaccine()
 
+def choose_vaccine():
+    
+    while True:
+        
+        vaccine_searched=session.query(Vaccine).filter(Vaccine.VaccineName.like(f'%{input("Enter vaccine name:")}%')).all()
+        counter=1
+        for x in vaccine_searched:
+            print(f'{counter}->{x.VaccineName}')
+            counter+=1
+        
+        vaccine_selected=int(input('_'))
+        if vaccine_selected > 0 and vaccine_selected<=len(vaccine_searched):
+            return vaccine_searched[vaccine_selected-1].VaccineID
 
+    
 while True:
     print("-_"*20)
 
@@ -58,6 +72,8 @@ while True:
     elif selection1==0:
         print("Exiting...")
         print("Exit successful!")
+
+        
         exit()
     else:
         print("Invalid entry try again..")
