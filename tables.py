@@ -3,10 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 Base=declarative_base()
-engine=create_engine("sqlite:///Vaccinations.db")
+engine=create_engine("sqlite:///Vaccinations.db",echo=True)
 
-Session=sessionmaker(bind=engine)
-session=Session()
+
 ##Owner class
 class Owner(Base):
     __tablename__='owners'
@@ -14,11 +13,12 @@ class Owner(Base):
     OwnerName=Column(String(24))
     ContactNumber=Column(String(18))
     Email=Column(String(24))
+    PetID=Column(Integer,ForeignKey("pets.PetID"),nullable=True)
 
     def __init__(self,owner_name,contact_number,email):
-        self.owner_name=owner_name
-        self.contact_number=contact_number
-        self.email=email
+        self.OwnerName=owner_name
+        self.ContactNumber=contact_number
+        self.Email=email
 
 
 ##Pet class
@@ -29,26 +29,26 @@ class Pet(Base):
     PetName=Column(String(12))
     PetType=Column(String(12))
     PetAge=Column(Integer)
-    OwnerID=Column(ForeignKey("owners.OwnerID") )
-    VaccineID=Column(ForeignKey("vaccines.VaccineID"))
+    OwnerID=Column(Integer,ForeignKey("owners.OwnerID") )
+    VaccineID=Column(Integer,ForeignKey("vaccines.VaccineID"))
 
-    def __init__(self,pet_name,pet_type,pet_age,pet_owner_id):
-        self.pet_name=pet_name
-        self.pet_type=pet_type
-        self.pet_age=pet_age
-        self.pet_owner_id=pet_owner_id
+    def __init__(self,pet_name,pet_type,pet_age,pet_owner_id,vaccine_id):
+        self.PetName=pet_name
+        self.PetType=pet_type
+        self.PetAge=pet_age
+        self.OwnerID=pet_owner_id
+        self.VaccineID=vaccine_id
+
    
 class Vaccine(Base):
     __tablename__='vaccines'
     VaccineID=Column(Integer,primary_key=True,autoincrement=True)
-    VaccineName=Column(String(24))
-    VaccinationDate=Column(String(24))
-    PetID=Column(Integer,ForeignKey("pets.PetID"),nullable=False)
+    VaccineName=Column(String(24),nullable=False)
+    
 
-    def __init__(self,vaccine_name,vaccination_date,pet_id):
-        self.vaccine_name=vaccine_name
-        self.vaccination_date=vaccination_date
-        self.pet_id=pet_id
+    def __init__(self,vaccine_name):
+        self.VaccineName=vaccine_name
+       
 
 
 Base.metadata.create_all(bind=engine)
