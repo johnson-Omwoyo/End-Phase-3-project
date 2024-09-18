@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine,Column,Integer,String,ForeignKey
+from sqlalchemy import create_engine,Column,Integer,String,ForeignKey,Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -29,6 +29,7 @@ class Pet(Base):
     PetName=Column(String(12))
     PetType=Column(String(12))
     PetAge=Column(Integer)
+    Vaccinated=Column(Boolean,default=False)
     OwnerID=Column(Integer,ForeignKey("owners.OwnerID") )
     VaccineID=Column(Integer,ForeignKey("vaccines.VaccineID"))
 
