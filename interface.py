@@ -3,6 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
 
 engine=create_engine("sqlite:///Vaccinations.db")
 Session=sessionmaker(bind=engine)
@@ -11,11 +14,11 @@ session=Session()
 
 def manage_vaccines():
     while True:
-        do_this=input("""
-        1->Add Vaccine
-        2->Remove Vaccine
-        3->View availabe vaccines
-        0->Back
+        do_this=input(f"""
+        1.Add Vaccine
+        2.Remove Vaccine
+        3.View availabe vaccines
+        0.Back
         __""")
         if do_this=="1":
             add_vaccine()
@@ -29,9 +32,9 @@ def manage_vaccines():
         elif do_this=="0":
             return
         elif do_this=="":
-            print("You enterd nothing try again!!")
+            print(f"{YELLOW}You entered nothing try again!!")
         else:
-            print("Invalid choice, try again!!")
+            print(f"{YELLOW}Invalid choice, try again!!")
         
 
 def add_vaccine():
@@ -40,13 +43,14 @@ def add_vaccine():
     session.add(vaccine)
     session.commit()
     print("Adding vaccine...")
-    print("Vaccine added successful!!!")
+    print(f"{GREEN}Vaccine added successful!!!")
     
 def remove_vaccine():
     available_vaccines=session.query(Vaccine.VaccineName).all()
     counter=1
     for single_vaccine in available_vaccines:
-        print(f'{counter}->{single_vaccine[0]}')
+        print(f'{counter}.{single_vaccine[0]}')
+        counter+=1
     
     remove=int(input("Remove:"))
     remove_name=available_vaccines[remove-1][0]
@@ -103,7 +107,7 @@ def choose_vaccine():
         counter=1
         if len(vaccine_searched) >0:
             for x in vaccine_searched:
-                print(f'{counter}->{x.VaccineName}')
+                print(f'{counter}.{x.VaccineName}')
                 counter+=1
             
             vaccine_selected=int(input('_'))
@@ -112,18 +116,17 @@ def choose_vaccine():
                 return vaccine_searched[vaccine_selected-1].VaccineID
                
         else:
-            print("Vaccine not found !!")
+            print(f"{RED}Vaccine not found !!")
 
 def search_pet():
     
     searched_pets=session.query(Pet).filter(Pet.PetName.like(f'%{input("Enter pet name:")}%')).all()
     print(searched_pets)
     counter=1
-
     for searched_pet in searched_pets:
         print(f'{counter}->{searched_pet.PetName}')
         counter+=1
-    select_pet=int(input ("Select pet"))
+    select_pet=int(input ("Select pet: "))
     selected_pet=searched_pets[select_pet-1]
     manage_pet(selected_pet)
 
@@ -132,32 +135,34 @@ def manage_pet(selected_pet):
     while True:
         selected_pet
         edit_pet= input("""
-        1->Mark Vaccinated
-        2->Drop
-        0->Back
-        __""")
+        1.Mark Vaccinated
+        2.Drop
+        0.Back
+        __ """)
         if edit_pet=="1":
             selected_pet.Vaccinated=True
             session.commit()
-            print("Pet vaccinated")
+            print(f"{GREEN}Pet vaccinated")
+            
         elif edit_pet=="2":
-            selected_pet.delete()
+            session.query(Pet).filter_by(PetID=selected_pet.PetID).delete()
             session.commit()
-            print('Pet removed')
+            print(f'{YELLOW}Pet removed')
+            return
         elif edit_pet=="0":
             return
         else:
-            print("Wrong entry")
+            print(f"{RED}Wrong entry")
         
 while True:
-    print("**_-"*20)
+    print("-_--_-"*10)
 
     selection1=input("""
     1->Add pet
     2->Search pet
     3->Manage vaccines
     0->Exit 
-    __""")
+    __ """)
     if selection1=="1":
         try:
             add_owner()
@@ -166,7 +171,7 @@ while True:
             print(f"SQLAlchemy error occurred: {e}")
         
         print("Adding pet....")
-        print("Pet added successful!")
+        print(f"{GREEN}Pet added successful!")
     elif selection1=="2":
         search_pet()
         
@@ -175,10 +180,10 @@ while True:
     
     elif selection1=="0":
         print("Exiting...")
-        print("Exit successful!")
+        print(f"{GREEN}Exit successful!")
         exit()
     else:
-        print("Invalid entry try again..")
+        print(f"{RED}Invalid entry try again..")
 
     
 
